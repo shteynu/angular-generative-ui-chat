@@ -11,16 +11,19 @@ import {
 import { materialCatalog } from 'ngx-json-render-material/catalog';
 import { scriptedModel } from './scripted-model.js';
 
-const gatewayKey = process.env['AI_GATEWAY_API_KEY'];
-
-/** True when a real model answers; false when the scripted one replays. */
-export const live = Boolean(gatewayKey);
-
-const model = live
-  ? (process.env['MODEL'] ?? 'anthropic/claude-sonnet-5.5')
-  : scriptedModel();
-
-export const modelName = live ? String(model) : 'the scripted model';
+/**
+ * Which model answers, read per request: on Cloudflare, secrets reach
+ * `process.env` through the `nodejs_compat` flag.
+ */
+export function chatModel() {
+  const live = Boolean(process.env['AI_GATEWAY_API_KEY']);
+  return {
+    live,
+    model: live
+      ? (process.env['MODEL'] ?? 'anthropic/claude-sonnet-5.5')
+      : scriptedModel(),
+  };
+}
 
 // Prose plus ```spec fenced JSONL patches, in the vocabulary of the catalog.
 const system = materialCatalog.prompt({ mode: 'inline' });
@@ -30,7 +33,7 @@ export async function handleChat(request: Request): Promise<Response> {
   const { messages } = (await request.json()) as { messages: UIMessage[] };
 
   const result = streamText({
-    model,
+    model: chatModel().model,
     system,
     messages: await convertToModelMessages(messages),
   });
@@ -46,5 +49,5 @@ export async function handleChat(request: Request): Promise<Response> {
 
 /** GET /api/chat: tells the client whether a real model is answering. */
 export function chatMode(): Response {
-  return Response.json({ mode: live ? 'live' : 'scripted' });
+  return Response.json({ mode: chatModel().live ? 'live' : 'scripted' });
 }

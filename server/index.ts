@@ -1,8 +1,9 @@
-// Local server for `npm start`; on Vercel, api/chat.ts serves the same handler.
+// Local server for `npm start`; on Cloudflare, worker/index.ts serves the same
+// handler.
 import { createServer } from 'node:http';
 import { Readable } from 'node:stream';
 import type { ReadableStream as NodeReadableStream } from 'node:stream/web';
-import { chatMode, handleChat, live, modelName } from './chat.js';
+import { chatMode, chatModel, handleChat } from './chat.js';
 
 const port = Number(process.env['PORT'] ?? 3000);
 
@@ -29,9 +30,10 @@ createServer(async (req, res) => {
     res.end();
   }
 }).listen(port, () => {
+  const { live, model } = chatModel();
   const using = live
-    ? `model ${modelName}`
-    : `${modelName} (no AI_GATEWAY_API_KEY)`;
+    ? `model ${String(model)}`
+    : 'the scripted model (no AI_GATEWAY_API_KEY)';
   console.log(
     `chat server on http://localhost:${port}/api/chat, using ${using}`,
   );

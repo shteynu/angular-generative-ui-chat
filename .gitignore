@@ -2,4 +2,5 @@
 /dist
 /.angular
 .env
-.vercel
+.dev.vars
+.wrangler

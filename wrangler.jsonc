@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "angular-generative-ui-chat",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-09-01",
+  // Gives the AI SDK the Node APIs it uses and puts secrets on process.env.
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./dist/angular-generative-ui-chat/browser",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"],
+  },
+  "observability": { "enabled": true },
+}

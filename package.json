@@ -7,6 +7,8 @@
     "start": "concurrently -n server,web -c magenta,cyan \"npm run server\" \"ng serve\"",
     "server": "tsx watch --env-file-if-exists=.env server/index.ts",
     "build": "ng build",
+    "preview": "ng build && wrangler dev",
+    "deploy": "wrangler deploy",
     "typecheck": "tsc -p tsconfig.server.json"
   },
   "dependencies": {
@@ -33,7 +35,8 @@
     "@types/node": "^22.10.5",
     "concurrently": "^9.2.1",
     "tsx": "^4.19.2",
-    "typescript": "~6.0.2"
+    "typescript": "~6.0.2",
+    "wrangler": "4.141.0"
   },
   "description": "Angular chat template: the model answers with live Angular Material UI, streamed through the Vercel AI SDK and rendered by ngx-json-render."
 }

@@ -3,11 +3,12 @@
 An Angular chat where the model answers with **real Angular Material UI** —
 dashboards, forms, comparisons — instead of only text. The Vercel AI SDK
 streams the answer, and [ngx-json-render](https://github.com/shteynu/ngx-json-render)
-renders the UI while it arrives.
+renders the UI while it arrives. One Cloudflare Worker serves both the app
+and the chat endpoint.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fshteynu%2Fangular-generative-ui-chat&project-name=angular-generative-ui-chat&repository-name=angular-generative-ui-chat)
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shteynu/angular-generative-ui-chat)
 
-**Demo:** https://angular-generative-ui-chat.vercel.app
+**Demo:** DEMO_URL
 
 ![A chat answer rendered as a Q3 revenue card with three metrics and a callout](docs/thumbnail.png)
 
@@ -16,9 +17,10 @@ renders the UI while it arrives.
 - **Angular 22**: standalone components, signals, zoneless, Angular Material 3.
 - **`Chat` from `@ai-sdk/angular`**: the AI SDK's own Angular client, on a
   `DefaultChatTransport` pointed at `/api/chat`.
-- **A Vercel Function** (`api/chat.ts`) that calls `streamText` through the
+- **A Cloudflare Worker** (`worker/index.ts`) that serves the Angular build
+  as static assets and answers `/api/chat` with `streamText` through the
   [Vercel AI Gateway](https://vercel.com/docs/ai-gateway), so any gateway
-  model works with one key.
+  model works with one key. Any other AI SDK provider works too.
 - **ngx-json-render** with the
   [Material catalog](https://www.npmjs.com/package/ngx-json-render-material):
   the model may only use the components in the catalog, so it cannot inject
@@ -26,16 +28,25 @@ renders the UI while it arrives.
 
 ## Deploy
 
-Click **Deploy with Vercel** above. The app works right away in demo mode:
-without a key, every question gets the same recorded answer, and nothing is
-billed. To talk to a real model, add `AI_GATEWAY_API_KEY` under Project
-Settings → Environment Variables and redeploy. `MODEL` picks the model
+Click **Deploy to Cloudflare** above: it copies the repository to your
+GitHub account and deploys it with Workers Builds, so every push redeploys.
+Or deploy from a clone:
+
+```bash
+npx wrangler login
+npm run build && npm run deploy
+```
+
+The app works right away in demo mode: without a key, every question gets the
+same recorded answer, and nothing is billed. To talk to a real model, add the
+key as a secret, `npx wrangler secret put AI_GATEWAY_API_KEY` (or Worker →
+Settings → Variables and Secrets). `MODEL`, a plain variable, picks the model
 (default `anthropic/claude-sonnet-5.5`).
 
 A deployed app is public, and every visitor's question is billed to your
 gateway key. Put it behind
-[Vercel Authentication](https://vercel.com/docs/deployment-protection) or your
-own login before you set a key on a public deployment.
+[Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/applications/configure-apps/self-hosted-public-app/)
+or your own login before you set a key on a public deployment.
 
 ## Run locally
 
@@ -46,8 +57,9 @@ npm start              # http://localhost:4200
 ```
 
 `npm start` runs the Angular dev server and `server/index.ts`, a small Node
-server that serves the same handler as the Vercel Function. `ng serve`
-proxies `/api` to it.
+server that serves the same handler as the Worker. `ng serve` proxies `/api`
+to it. `npm run preview` builds the app and runs the real Worker locally with
+`wrangler dev`; it reads secrets from `.dev.vars`.
 
 ## How it works
 
