@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "angular",
+  "buildCommand": "ng build",
+  "outputDirectory": "dist/angular-generative-ui-chat/browser"
+}

@@ -1,0 +1,61 @@
+<main>
+  <header>
+    <h1>Generative UI chat</h1>
+    <p class="lede">
+      Ask for a dashboard, a form or a comparison. The model answers with a
+      sentence and a UI spec; <code>&#64;ai-sdk/angular</code> streams it and
+      <a href="https://github.com/shteynu/ngx-json-render">ngx-json-render</a>
+      draws it with Angular Material components while it arrives.
+    </p>
+    @if (mode() === 'scripted') {
+      <p class="mode" role="note">
+        Demo mode: no <code>AI_GATEWAY_API_KEY</code> is set, so every question
+        gets the same recorded answer. Deploy your own copy with a key to talk
+        to a real model.
+      </p>
+    }
+  </header>
+
+  @for (message of messages(); track message.id; let last = $last) {
+    <app-chat-message [message]="message" [streaming]="last && busy()" />
+  } @empty {
+    <div class="suggestions">
+      @for (suggestion of suggestions(); track suggestion) {
+        <button mat-stroked-button type="button" (click)="send(suggestion)">
+          {{ suggestion }}
+        </button>
+      }
+    </div>
+  }
+
+  @if (chat.error; as error) {
+    <p class="error" role="alert">{{ error.message }}</p>
+  }
+
+  <form (ngSubmit)="send()">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Ask for some UI</mat-label>
+      <input
+        matInput
+        name="draft"
+        autocomplete="off"
+        [ngModel]="draft()"
+        (ngModelChange)="draft.set($event)"
+      />
+    </mat-form-field>
+    @if (busy()) {
+      <button
+        mat-icon-button
+        type="button"
+        aria-label="Stop"
+        (click)="chat.stop()"
+      >
+        <mat-icon>stop</mat-icon>
+      </button>
+    } @else {
+      <button mat-icon-button type="submit" aria-label="Send">
+        <mat-icon>send</mat-icon>
+      </button>
+    }
+  </form>
+</main>
