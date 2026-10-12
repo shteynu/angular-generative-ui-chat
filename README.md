@@ -8,7 +8,7 @@ and the chat endpoint.
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shteynu/angular-generative-ui-chat)
 
-**Demo:** DEMO_URL
+**Demo:** <https://angular-generative-ui-chat.angular-generative-ui-chat.workers.dev>
 
 ![A chat answer rendered as a Q3 revenue card with three metrics and a callout](docs/thumbnail.png)
 
